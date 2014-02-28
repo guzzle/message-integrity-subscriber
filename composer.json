@@ -1,0 +1,21 @@
+{
+    "name": "guzzle/message-integrity-subscriber",
+    "description": "Verifies the integrity of HTTP responses using customizable validators (Guzzle 4+)",
+    "homepage": "http://guzzlephp.org/",
+    "keywords": ["http", "guzzle"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michael Dowling",
+            "email": "mtdowling@gmail.com",
+            "homepage": "https://github.com/mtdowling"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "guzzle/guzzle": "dev-guzzle4"
+    },
+    "autoload": {
+        "psr-4": { "GuzzleHttp\\Subscriber\\MessageIntegrity\\": "src/" }
+    }
+}
