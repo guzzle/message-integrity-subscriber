@@ -1,5 +1,5 @@
 {
-    "name": "guzzle/message-integrity-subscriber",
+    "name": "guzzlehttp/message-integrity-subscriber",
     "description": "Verifies the integrity of HTTP responses using customizable validators (Guzzle 4+)",
     "homepage": "http://guzzlephp.org/",
     "keywords": ["http", "guzzle"],
