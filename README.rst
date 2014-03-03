@@ -59,6 +59,23 @@ is thrown. This exception extends from ``GuzzleHttp\Exception\RequestException``
 so it contains a request accessed via ``getRequest()`` and a response via
 ``getResponse()``.
 
+.. code-block:: php
+
+    use GuzzleHttp\Client();
+    use GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegritySubscriber;
+    use GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegrityException;
+
+    $subscriber = MessageIntegritySubscriber::createForContentMd5();
+    $client = new Client();
+    $client->getEmitter()->addSubscriber($subscriber);
+
+    try {
+        $client->get('http://httpbin.org/get');
+    } catch (MessageIntegrityException $e) {
+        echo $e->getRequest() . "\n";
+        echo $e->getResponse() . "\n";
+    }
+
 Limitations
 -----------
 
