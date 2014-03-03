@@ -35,7 +35,7 @@ hash
 
 size_cutoff
     (integer) If specified, the message integrity will only be validated if the
-     response size is less than the ``size_cutoff`` value (in bytes).
+    response size is less than the ``size_cutoff`` value (in bytes).
 
 .. code-block:: php
 
