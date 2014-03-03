@@ -21,28 +21,55 @@ class MessageIntegritySubscriber implements SubscriberInterface
      */
     public static function createForContentMd5()
     {
-        return new self('Content-MD5', new PhpHash('md5'));
+        return new self([
+            'header' => 'Content-MD5',
+            'hash'   => new PhpHash('md5')
+        ]);
     }
 
     /**
-     * @param string        $header     Header to check
-     * @param HashInterface $hash       Hash used to validate the header value
-     * @param int           $sizeCutoff Don't validate when size is greater than this number
+     * Validates the options provided to an integrity plugin.
+     *
+     * @param array $config Associative array of configuration options.
+     * @throws \InvalidArgumentException
      */
-    public function __construct($header, HashInterface $hash, $sizeCutoff = null)
+    public static function validateOptions(array &$config)
     {
-        $this->full = new FullResponseIntegritySubscriber($header, $hash, $sizeCutoff);
-        $this->streaming = new StreamingResponseIntegritySubscriber($header, $hash);
+        if (!isset($config['header'])) {
+            throw new \InvalidArgumentException('header is required');
+        }
+
+        if (!isset($config['hash'])) {
+            throw new \InvalidArgumentException('hash is required');
+        }
+
+        if (!($config['hash']) instanceof HashInterface) {
+            throw new \InvalidArgumentException('hash must be an instance of HashInterface');
+        }
+    }
+
+    /**
+     * @param array $config Associative array of configuration options.
+     *     - header: (string) The name of the header to validate against.
+     *     - hash: (HashInterface) used to validate the header value
+     *     - size_cutoff: (int) Don't validate when size is greater than this
+     *       number.
+     * @throws \InvalidArgumentException
+     */
+    public function __construct(array $config)
+    {
+        $this->full = new OnCompleteIntegritySubscriber($config);
+        $this->streaming = new StreamIntegritySubscriber($config);
     }
 
     public static function getSubscribedEvents()
     {
-        return ['before' => ['onRequestBeforeSend']];
+        return ['before' => ['onBefore']];
     }
 
-    public function onRequestBeforeSend(BeforeEvent $event)
+    public function onBefore(BeforeEvent $event)
     {
-        if ($event->getRequest()->getConfig()->get('streaming')) {
+        if ($event->getRequest()->getConfig()['stream']) {
             $event->getRequest()->getEmitter()->addSubscriber($this->streaming);
         } else {
             $event->getRequest()->getEmitter()->addSubscriber($this->full);

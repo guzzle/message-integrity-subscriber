@@ -3,19 +3,19 @@
 namespace GuzzleHttp\Subscriber\MessageIntegrity;
 
 /**
- * Interface that allows implementing various incremental hashes
+ * Interface that allows implementing various incremental hashes.
  */
 interface HashInterface
 {
     /**
-     * Add data to the
+     * Adds data to the hash.
      *
-     * @param $data
+     * @param string $data Data to add to the hash
      */
     public function update($data);
 
     /**
-     * Finalize an incremental hash and return resulting digest
+     * Finalizes the incremental hash and returns the resulting digest.
      *
      * @return string
      */

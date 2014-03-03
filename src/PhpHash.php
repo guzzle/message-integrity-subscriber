@@ -3,7 +3,7 @@
 namespace GuzzleHttp\Subscriber\MessageIntegrity;
 
 /**
- * Incremental hashing using PHP's hash functions
+ * Incremental hashing using PHP's hash functions.
  */
 class PhpHash implements HashInterface
 {
@@ -12,9 +12,10 @@ class PhpHash implements HashInterface
     private $options;
 
     /**
-     * @param string $algo    Hashing algorithm. One of PHP's hash_algos() return values (e.g. md5)
+     * @param string $algo Hashing algorithm. One of PHP's hash_algos()
+     *     return values (e.g. md5, sha1, etc...).
      * @param array  $options Associative array of hashing options:
-     *     - hmac_key: Shared secret key used with HMAC algorithms
+     *     - key: Secret key used with the hashing algorithm.
      */
     public function __construct($algo, array $options = [])
     {
@@ -33,18 +34,6 @@ class PhpHash implements HashInterface
     }
 
     /**
-     * Create a hash context
-     */
-    protected function createContext()
-    {
-        if (isset($this->options['hmac_key'])) {
-            $this->context = hash_init($this->algo, HASH_HMAC, $this->options['hmac_key']);
-        } else {
-            $this->context = hash_init($this->algo);
-        }
-    }
-
-    /**
      * Get a hash context or create one if needed
      *
      * @return resource
@@ -52,7 +41,12 @@ class PhpHash implements HashInterface
     private function getContext()
     {
         if (!$this->context) {
-            $this->createContext();
+            $key = isset($this->options['key']) ? $this->options['key'] : null;
+            $this->context = hash_init(
+                $this->algo,
+                $key ? HASH_HMAC : 0,
+                $key
+            );
         }
 
         return $this->context;

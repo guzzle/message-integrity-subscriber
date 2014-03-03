@@ -10,23 +10,29 @@ use GuzzleHttp\Message\ResponseInterface;
  * Verifies the message integrity of a response only after the entire response
  * body has been read.
  */
-class StreamingResponseIntegritySubscriber implements SubscriberInterface
+class StreamIntegritySubscriber implements SubscriberInterface
 {
     private $hash;
     private $header;
 
-    public function __construct($header, HashInterface $hash)
+    /**
+     * @param array $config Associative array of configuration options.
+     * @see GuzzleHttp\Subscriber\MessageIntegritySubscriber::__construct for a
+     *     list of available configuration options.
+     */
+    public function __construct(array $config)
     {
-        $this->header = $header;
-        $this->hash = $hash;
+        MessageIntegritySubscriber::validateOptions($config);
+        $this->header = $config['header'];
+        $this->hash = $config['hash'];
     }
 
     public static function getSubscribedEvents()
     {
-        return ['headers' => ['onRequestGotHeaders', -1]];
+        return ['headers' => ['onHeaders', -1]];
     }
 
-    public function onRequestGotHeaders(HeadersEvent $event)
+    public function onHeaders(HeadersEvent $event)
     {
         $response = $event->getResponse();
         if (!$this->canValidate($response)) {
@@ -34,21 +40,18 @@ class StreamingResponseIntegritySubscriber implements SubscriberInterface
         }
 
         $request = $event->getRequest();
-        $expected = (string) $response->getHeader($this->header);
         $response->setBody(new ReadIntegrityStream(
             $response->getBody(),
             $this->hash,
-            function ($result) use ($request, $response, $expected) {
-                if ($expected !== $result) {
-                    throw new MessageIntegrityException(
-                        sprintf(
-                            '%s message integrity check failure. Expected "%s" but got "%s"',
-                            $this->header, $expected, $result
-                        ),
-                        $request,
-                        $response
-                    );
-                }
+            (string) $response->getHeader($this->header),
+            function ($result, $expected) use ($request, $response) {
+                throw new MessageIntegrityException(
+                    sprintf('%s message integrity check failure. Expected '
+                        . '"%s" but got "%s"', $this->header, $expected, $result
+                    ),
+                    $request,
+                    $response
+                );
             }
         ));
     }
