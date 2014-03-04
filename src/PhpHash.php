@@ -16,6 +16,7 @@ class PhpHash implements HashInterface
      *     return values (e.g. md5, sha1, etc...).
      * @param array  $options Associative array of hashing options:
      *     - key: Secret key used with the hashing algorithm.
+     *     - base64: Set to true to base64 encode the value when complete.
      */
     public function __construct($algo, array $options = [])
     {
@@ -30,7 +31,13 @@ class PhpHash implements HashInterface
 
     public function complete()
     {
-        return hash_final($this->getContext(), true);
+        $hash = hash_final($this->getContext(), true);
+
+        if (isset($this->options['base64']) && $this->options['base64']) {
+            $hash = base64_encode($hash);
+        }
+
+        return $hash;
     }
 
     /**

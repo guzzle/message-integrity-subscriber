@@ -13,7 +13,7 @@ use GuzzleHttp\Message\ResponseInterface;
 class StreamIntegritySubscriber implements SubscriberInterface
 {
     private $hash;
-    private $header;
+    private $expectedFn;
 
     /**
      * @param array $config Associative array of configuration options.
@@ -23,7 +23,7 @@ class StreamIntegritySubscriber implements SubscriberInterface
     public function __construct(array $config)
     {
         MessageIntegritySubscriber::validateOptions($config);
-        $this->header = $config['header'];
+        $this->expectedFn = $config['expected'];
         $this->hash = $config['hash'];
     }
 
@@ -35,7 +35,7 @@ class StreamIntegritySubscriber implements SubscriberInterface
     public function onHeaders(HeadersEvent $event)
     {
         $response = $event->getResponse();
-        if (!$this->canValidate($response)) {
+        if (!($expected = $this->getExpected($response))) {
             return;
         }
 
@@ -43,12 +43,11 @@ class StreamIntegritySubscriber implements SubscriberInterface
         $response->setBody(new ReadIntegrityStream(
             $response->getBody(),
             $this->hash,
-            (string) $response->getHeader($this->header),
+            $expected,
             function ($result, $expected) use ($request, $response) {
                 throw new MessageIntegrityException(
-                    sprintf('%s message integrity check failure. Expected '
-                        . '"%s" but got "%s"', $this->header, $expected, $result
-                    ),
+                    sprintf('Message integrity check failure. Expected '
+                        . '"%s" but got "%s"', $expected, $result),
                     $request,
                     $response
                 );
@@ -56,11 +55,9 @@ class StreamIntegritySubscriber implements SubscriberInterface
         ));
     }
 
-    private function canValidate(ResponseInterface $response)
+    private function getExpected(ResponseInterface $response)
     {
         if (!($body = $response->getBody())) {
-            return false;
-        } elseif (!$response->hasHeader($this->header)) {
             return false;
         } elseif ($response->hasHeader('Transfer-Encoding') ||
             $response->hasHeader('Content-Encoding')
@@ -69,6 +66,6 @@ class StreamIntegritySubscriber implements SubscriberInterface
             return false;
         }
 
-        return true;
+        return call_user_func($this->expectedFn, $response);
     }
 }

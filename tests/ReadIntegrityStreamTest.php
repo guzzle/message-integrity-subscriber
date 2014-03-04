@@ -25,7 +25,7 @@ class ReadIntegrityStreamTest extends \PHPUnit_Framework_TestCase
     public function testValidatesRollingMd5WithCallback()
     {
         $real = Stream::factory('foobar');
-        $hash = new PhpHash('md5');
+        $hash = new PhpHash('md5', ['base64' => true]);
         $stream = new ReadIntegrityStream($real, $hash, 'foo', function ($a, $b) {
             $this->assertEquals(base64_encode(md5('foobar', true)), $a);
             $this->assertEquals('foo', $b);
@@ -48,7 +48,7 @@ class ReadIntegrityStreamTest extends \PHPUnit_Framework_TestCase
     public function testValidatesSuccessfully()
     {
         $real = Stream::factory('foobar');
-        $hash = new PhpHash('md5');
+        $hash = new PhpHash('md5', ['base64' => true]);
         $expected = base64_encode(md5('foobar', true));
         $stream = new ReadIntegrityStream($real, $hash, $expected);
         $stream->getContents();

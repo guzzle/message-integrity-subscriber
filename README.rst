@@ -23,10 +23,10 @@ Constructor Options
 The ``GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegritySubscriber`` class
 accepts an associative array of options:
 
-header
-    (string) The name of the header to validate against. This header value is
-    retrieved from the response, and, if present, will be compared against the
-    result of a rolling hash.
+expected
+    (callable) A function that returns the hash that is expected for a
+    response. The function accepts a ResponseInterface objects and returns a
+    string that is compared against the calculated rolling hash.
 
 hash
     (``GuzzleHttp\Subscriber\MessageIntegrity\HashInterface``) A hash object
@@ -40,11 +40,14 @@ size_cutoff
 .. code-block:: php
 
     use GuzzleHttp\Client();
+    use GuzzleHttp\Message\ResponseInterface;
     use GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegritySubscriber;
 
     $subscriber = new MessageIntegritySubscriber([
-        'header' => 'Content-MD5',
-        'hash'   => new PhpHash('md5')
+        'hash' => new PhpHash('md5', ['base64' => true])
+        'expected' => function (ResponseInterface $response) {
+            return $response->getHeader('Content-MD5');
+        }
     ]);
 
     $client = new Client();

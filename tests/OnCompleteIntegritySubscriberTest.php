@@ -3,6 +3,7 @@
 namespace GuzzleHttp\Tests\MessageIntegrity;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Message\ResponseInterface;
 use GuzzleHttp\Subscriber\MessageIntegrity\OnCompleteIntegritySubscriber;
 use GuzzleHttp\Subscriber\MessageIntegrity\PhpHash;
 use GuzzleHttp\Subscriber\Mock;
@@ -13,13 +14,15 @@ class OnCompleteIntegritySubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegrityException
-     * @expectedExceptionMessage Content-MD5 message integrity check failure. Expected "fud" but got "rL0Y20zC+Fzt72VPzMSk2A==
+     * @expectedExceptionMessage Message integrity check failure. Expected "fud" but got "rL0Y20zC+Fzt72VPzMSk2A==
      */
     public function testThrowsSpecificException()
     {
         $sub = new OnCompleteIntegritySubscriber([
-            'header' => 'Content-MD5',
-            'hash'   => new PhpHash('md5')
+            'hash' => new PhpHash('md5', ['base64' => true]),
+            'expected' => function (ResponseInterface $response) {
+                return $response->getHeader('Content-MD5');
+            }
         ]);
         $client = new Client();
         $client->getEmitter()->addSubscriber($sub);

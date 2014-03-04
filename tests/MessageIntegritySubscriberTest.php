@@ -12,7 +12,12 @@ class MessageIntegritySubscriberTest extends \PHPUnit_Framework_TestCase
 {
     public function configProvider()
     {
-        return [[[]], [['header' => 'foo']], [['header' => 'foo', 'hash' => 'foo']]];
+        return [
+            [[]],
+            [['expected' => 'foo']],
+            [['expected' => function() {}]],
+            [['expected' => function() {}, 'hash' => 'foo']]
+        ];
     }
 
     /**

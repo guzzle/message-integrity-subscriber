@@ -56,7 +56,7 @@ class ReadIntegrityStream implements StreamInterface
             $this->hash->update($data);
             $this->lastHashPos += $length;
             if ($this->eof()) {
-                $result = base64_encode($this->hash->complete());
+                $result = $this->hash->complete();
                 if ($this->expected !== $result) {
                     $this->mismatch($result);
                 }

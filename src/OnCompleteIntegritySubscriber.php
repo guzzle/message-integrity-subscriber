@@ -15,7 +15,9 @@ class OnCompleteIntegritySubscriber implements SubscriberInterface
 {
     /** @var HashInterface */
     private $hash;
-    private $header;
+
+    /** @var callable */
+    private $expectedFn;
     private $sizeCutoff;
 
     /**
@@ -26,7 +28,7 @@ class OnCompleteIntegritySubscriber implements SubscriberInterface
     public function __construct(array $config)
     {
         MessageIntegritySubscriber::validateOptions($config);
-        $this->header = $config['header'];
+        $this->expectedFn = $config['expected'];
         $this->hash = $config['hash'];
         $this->sizeCutoff = isset($config['size_cutoff'])
             ? $config['size_cutoff']
@@ -40,21 +42,17 @@ class OnCompleteIntegritySubscriber implements SubscriberInterface
 
     public function onComplete(CompleteEvent $event)
     {
-        if ($this->canValidate($event->getResponse())) {
-            $response = $event->getResponse();
-            $this->matchesHash(
-                $event,
-                (string) $response->getHeader($this->header),
-                $response->getBody()
-            );
+        $response = $event->getResponse();
+        $expected = call_user_func($this->expectedFn, $response);
+
+        if ($expected !== null && $this->canValidate($response)) {
+            $this->matchesHash($event, $expected, $response->getBody());
         }
     }
 
     private function canValidate(ResponseInterface $response)
     {
         if (!($body = $response->getBody())) {
-            return false;
-        } elseif (!$response->hasHeader($this->header)) {
             return false;
         } elseif ($response->hasHeader('Transfer-Encoding') ||
             $response->hasHeader('Content-Encoding')
@@ -82,12 +80,12 @@ class OnCompleteIntegritySubscriber implements SubscriberInterface
             $this->hash->update($body->read(16384));
         }
 
-        $result = base64_encode($this->hash->complete());
+        $result = $this->hash->complete();
 
         if ($hash !== $result) {
             throw new MessageIntegrityException(
-                sprintf('%s message integrity check failure. Expected "%s" but'
-                    . ' got "%s"', $this->header, $hash, $result),
+                sprintf('Message integrity check failure. Expected "%s" but'
+                    . ' got "%s"', $hash, $result),
                 $event->getRequest(),
                 $event->getResponse()
             );
