@@ -10,7 +10,7 @@ use GuzzleHttp\Message\ResponseInterface;
  * Verifies the message integrity of a response after all of the data has been
  * received.
  */
-class MessageIntegritySubscriber implements SubscriberInterface
+class ResponseSubscriber implements SubscriberInterface
 {
     private $full;
     private $streaming;
@@ -18,7 +18,7 @@ class MessageIntegritySubscriber implements SubscriberInterface
     /**
      * Creates a new plugin that validates the Content-MD5 of responses
      *
-     * @return MessageIntegritySubscriber
+     * @return self
      */
     public static function createForContentMd5()
     {

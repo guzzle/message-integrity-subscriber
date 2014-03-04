@@ -11,16 +11,16 @@ method for validating a ``Content-MD5`` header.
 .. code-block:: php
 
     use GuzzleHttp\Client();
-    use GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegritySubscriber;
+    use GuzzleHttp\Subscriber\MessageIntegrity\ResponseSubscriber;
 
-    $subscriber = MessageIntegritySubscriber::createForContentMd5();
+    $subscriber = ResponseSubscriber::createForContentMd5();
     $client = new Client();
     $client->getEmitter()->addSubscriber($subscriber);
 
 Constructor Options
 -------------------
 
-The ``GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegritySubscriber`` class
+The ``GuzzleHttp\Subscriber\MessageIntegrity\ResponseSubscriber`` class
 accepts an associative array of options:
 
 expected
@@ -41,9 +41,9 @@ size_cutoff
 
     use GuzzleHttp\Client();
     use GuzzleHttp\Message\ResponseInterface;
-    use GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegritySubscriber;
+    use GuzzleHttp\Subscriber\MessageIntegrity\ResponseSubscriber;
 
-    $subscriber = new MessageIntegritySubscriber([
+    $subscriber = new ResponseSubscriber([
         'hash' => new PhpHash('md5', ['base64' => true])
         'expected' => function (ResponseInterface $response) {
             return $response->getHeader('Content-MD5');
@@ -65,10 +65,10 @@ so it contains a request accessed via ``getRequest()`` and a response via
 .. code-block:: php
 
     use GuzzleHttp\Client();
-    use GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegritySubscriber;
+    use GuzzleHttp\Subscriber\MessageIntegrity\ResponseSubscriber;
     use GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegrityException;
 
-    $subscriber = MessageIntegritySubscriber::createForContentMd5();
+    $subscriber = ResponseSubscriber::createForContentMd5();
     $client = new Client();
     $client->getEmitter()->addSubscriber($subscriber);
 

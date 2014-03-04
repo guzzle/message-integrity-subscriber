@@ -17,12 +17,12 @@ class StreamIntegritySubscriber implements SubscriberInterface
 
     /**
      * @param array $config Associative array of configuration options.
-     * @see GuzzleHttp\Subscriber\MessageIntegritySubscriber::__construct for a
+     * @see GuzzleHttp\Subscriber\ResponseSubscriber::__construct for a
      *     list of available configuration options.
      */
     public function __construct(array $config)
     {
-        MessageIntegritySubscriber::validateOptions($config);
+        ResponseSubscriber::validateOptions($config);
         $this->expectedFn = $config['expected'];
         $this->hash = $config['hash'];
     }
