@@ -34,8 +34,8 @@ class ResponseSubscriberTest extends \PHPUnit_Framework_TestCase
         $sub = ResponseSubscriber::createForContentMd5();
         $md5Test = base64_encode(md5('foo', true));
         $client = new Client();
-        $client->getEmitter()->addSubscriber($sub);
-        $client->getEmitter()->addSubscriber(new Mock([
+        $client->getEmitter()->attach($sub);
+        $client->getEmitter()->attach(new Mock([
             new Response(200, ['Content-MD5' => $md5Test], Stream::factory('foo'))
         ]));
         $request = $client->createRequest('GET', 'http://httpbin.org');
@@ -51,8 +51,8 @@ class ResponseSubscriberTest extends \PHPUnit_Framework_TestCase
         $sub = ResponseSubscriber::createForContentMd5();
         $md5Test = base64_encode(md5('foo', true));
         $client = new Client();
-        $client->getEmitter()->addSubscriber($sub);
-        $client->getEmitter()->addSubscriber(new Mock([
+        $client->getEmitter()->attach($sub);
+        $client->getEmitter()->attach(new Mock([
             new Response(200, ['Content-MD5' => $md5Test], Stream::factory('foo'))
         ]));
         $request = $client->createRequest('GET', 'http://httpbin.org', ['stream' => true]);

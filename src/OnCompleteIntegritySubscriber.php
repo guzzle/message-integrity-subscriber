@@ -35,7 +35,7 @@ class OnCompleteIntegritySubscriber implements SubscriberInterface
             : null;
     }
 
-    public static function getSubscribedEvents()
+    public function getEvents()
     {
         return ['complete' => ['onComplete', -1]];
     }

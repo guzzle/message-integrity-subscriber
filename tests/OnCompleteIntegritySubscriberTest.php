@@ -25,8 +25,8 @@ class OnCompleteIntegritySubscriberTest extends \PHPUnit_Framework_TestCase
             }
         ]);
         $client = new Client();
-        $client->getEmitter()->addSubscriber($sub);
-        $client->getEmitter()->addSubscriber(new Mock([
+        $client->getEmitter()->attach($sub);
+        $client->getEmitter()->attach(new Mock([
             new Response(200, ['Content-MD5' => 'fud'], Stream::factory('foo'))
         ]));
         $request = $client->createRequest('GET', 'http://httpbin.org');

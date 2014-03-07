@@ -27,7 +27,7 @@ class StreamIntegritySubscriber implements SubscriberInterface
         $this->hash = $config['hash'];
     }
 
-    public static function getSubscribedEvents()
+    public function getEvents()
     {
         return ['headers' => ['onHeaders', -1]];
     }

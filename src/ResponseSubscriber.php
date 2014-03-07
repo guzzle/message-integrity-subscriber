@@ -73,7 +73,7 @@ class ResponseSubscriber implements SubscriberInterface
         $this->streaming = new StreamIntegritySubscriber($config);
     }
 
-    public static function getSubscribedEvents()
+    public function getEvents()
     {
         return ['before' => ['onBefore']];
     }
@@ -81,9 +81,9 @@ class ResponseSubscriber implements SubscriberInterface
     public function onBefore(BeforeEvent $event)
     {
         if ($event->getRequest()->getConfig()['stream']) {
-            $event->getRequest()->getEmitter()->addSubscriber($this->streaming);
+            $event->getRequest()->getEmitter()->attach($this->streaming);
         } else {
-            $event->getRequest()->getEmitter()->addSubscriber($this->full);
+            $event->getRequest()->getEmitter()->attach($this->full);
         }
     }
 }

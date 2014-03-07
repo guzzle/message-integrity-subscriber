@@ -15,7 +15,7 @@ method for validating a ``Content-MD5`` header.
 
     $subscriber = ResponseSubscriber::createForContentMd5();
     $client = new Client();
-    $client->getEmitter()->addSubscriber($subscriber);
+    $client->getEmitter()->attach($subscriber);
 
 Constructor Options
 -------------------
@@ -51,7 +51,7 @@ size_cutoff
     ]);
 
     $client = new Client();
-    $client->getEmitter()->addSubscriber($subscriber);
+    $client->getEmitter()->attach($subscriber);
 
 Handling Errors
 ---------------
@@ -70,7 +70,7 @@ so it contains a request accessed via ``getRequest()`` and a response via
 
     $subscriber = ResponseSubscriber::createForContentMd5();
     $client = new Client();
-    $client->getEmitter()->addSubscriber($subscriber);
+    $client->getEmitter()->attach($subscriber);
 
     try {
         $client->get('http://httpbin.org/get');
