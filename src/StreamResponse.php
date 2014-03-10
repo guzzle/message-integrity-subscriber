@@ -2,6 +2,7 @@
 
 namespace GuzzleHttp\Subscriber\MessageIntegrity;
 
+use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Event\HeadersEvent;
 use GuzzleHttp\Message\ResponseInterface;
@@ -10,26 +11,27 @@ use GuzzleHttp\Message\ResponseInterface;
  * Verifies the message integrity of a response only after the entire response
  * body has been read.
  */
-class StreamIntegritySubscriber implements SubscriberInterface
+class StreamResponse implements SubscriberInterface
 {
     private $hash;
     private $expectedFn;
 
     /**
      * @param array $config Associative array of configuration options.
-     * @see GuzzleHttp\Subscriber\ResponseSubscriber::__construct for a
+     * @see GuzzleHttp\Subscriber\ResponseIntegrity::__construct for a
      *     list of available configuration options.
      */
     public function __construct(array $config)
     {
-        ResponseSubscriber::validateOptions($config);
+        ResponseIntegrity::validateOptions($config);
         $this->expectedFn = $config['expected'];
         $this->hash = $config['hash'];
     }
 
     public function getEvents()
     {
-        return ['headers' => ['onHeaders', -1]];
+        // Fire this event near the end of the event chain.
+        return ['headers' => ['onHeaders', RequestEvents::LATE]];
     }
 
     public function onHeaders(HeadersEvent $event)

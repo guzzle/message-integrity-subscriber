@@ -10,7 +10,7 @@ use GuzzleHttp\Message\ResponseInterface;
  * Verifies the message integrity of a response after all of the data has been
  * received.
  */
-class ResponseSubscriber implements SubscriberInterface
+class ResponseIntegrity implements SubscriberInterface
 {
     private $full;
     private $streaming;
@@ -69,8 +69,8 @@ class ResponseSubscriber implements SubscriberInterface
      */
     public function __construct(array $config)
     {
-        $this->full = new OnCompleteIntegritySubscriber($config);
-        $this->streaming = new StreamIntegritySubscriber($config);
+        $this->full = new CompleteResponse($config);
+        $this->streaming = new StreamResponse($config);
     }
 
     public function getEvents()

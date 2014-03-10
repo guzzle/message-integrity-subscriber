@@ -5,10 +5,10 @@ namespace GuzzleHttp\Tests\MessageIntegrity;
 use GuzzleHttp\Client;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
-use GuzzleHttp\Subscriber\MessageIntegrity\ResponseSubscriber;
+use GuzzleHttp\Subscriber\MessageIntegrity\ResponseIntegrity;
 use GuzzleHttp\Subscriber\Mock;
 
-class ResponseSubscriberTest extends \PHPUnit_Framework_TestCase
+class ResponseIntegrityTest extends \PHPUnit_Framework_TestCase
 {
     public function configProvider()
     {
@@ -26,12 +26,12 @@ class ResponseSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidatesConfig($config)
     {
-        ResponseSubscriber::validateOptions($config);
+        ResponseIntegrity::validateOptions($config);
     }
 
     public function testAddsFullResponse()
     {
-        $sub = ResponseSubscriber::createForContentMd5();
+        $sub = ResponseIntegrity::createForContentMd5();
         $md5Test = base64_encode(md5('foo', true));
         $client = new Client();
         $client->getEmitter()->attach($sub);
@@ -43,12 +43,12 @@ class ResponseSubscriberTest extends \PHPUnit_Framework_TestCase
         $ins = array_map(function ($rec) {
             return get_class($rec[0]);
         }, $request->getEmitter()->listeners('complete'));
-        $this->assertContains('GuzzleHttp\\Subscriber\\MessageIntegrity\\OnCompleteIntegritySubscriber', $ins);
+        $this->assertContains('GuzzleHttp\\Subscriber\\MessageIntegrity\\CompleteResponse', $ins);
     }
 
     public function testAddsStreaming()
     {
-        $sub = ResponseSubscriber::createForContentMd5();
+        $sub = ResponseIntegrity::createForContentMd5();
         $md5Test = base64_encode(md5('foo', true));
         $client = new Client();
         $client->getEmitter()->attach($sub);

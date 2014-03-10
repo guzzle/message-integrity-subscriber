@@ -2,6 +2,7 @@
 
 namespace GuzzleHttp\Subscriber\MessageIntegrity;
 
+use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Message\ResponseInterface;
@@ -11,7 +12,7 @@ use GuzzleHttp\Stream\StreamInterface;
  * Verifies the message integrity of a response after all of the data has been
  * received.
  */
-class OnCompleteIntegritySubscriber implements SubscriberInterface
+class CompleteResponse implements SubscriberInterface
 {
     /** @var HashInterface */
     private $hash;
@@ -22,12 +23,12 @@ class OnCompleteIntegritySubscriber implements SubscriberInterface
 
     /**
      * @param array $config Associative array of configuration options.
-     * @see GuzzleHttp\Subscriber\ResponseSubscriber::__construct for a
+     * @see GuzzleHttp\Subscriber\ResponseIntegrity::__construct for a
      *     list of available configuration options.
      */
     public function __construct(array $config)
     {
-        ResponseSubscriber::validateOptions($config);
+        ResponseIntegrity::validateOptions($config);
         $this->expectedFn = $config['expected'];
         $this->hash = $config['hash'];
         $this->sizeCutoff = isset($config['size_cutoff'])
@@ -37,7 +38,8 @@ class OnCompleteIntegritySubscriber implements SubscriberInterface
 
     public function getEvents()
     {
-        return ['complete' => ['onComplete', -1]];
+        // Fire at the same level of normal response verification.
+        return ['complete' => ['onComplete', RequestEvents::VERIFY_RESPONSE]];
     }
 
     public function onComplete(CompleteEvent $event)

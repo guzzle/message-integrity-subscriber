@@ -4,13 +4,13 @@ namespace GuzzleHttp\Tests\MessageIntegrity;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Message\ResponseInterface;
-use GuzzleHttp\Subscriber\MessageIntegrity\OnCompleteIntegritySubscriber;
+use GuzzleHttp\Subscriber\MessageIntegrity\CompleteResponse;
 use GuzzleHttp\Subscriber\MessageIntegrity\PhpHash;
 use GuzzleHttp\Subscriber\Mock;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 
-class OnCompleteIntegritySubscriberTest extends \PHPUnit_Framework_TestCase
+class CompleteResponseTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \GuzzleHttp\Subscriber\MessageIntegrity\MessageIntegrityException
@@ -18,7 +18,7 @@ class OnCompleteIntegritySubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowsSpecificException()
     {
-        $sub = new OnCompleteIntegritySubscriber([
+        $sub = new CompleteResponse([
             'hash' => new PhpHash('md5', ['base64' => true]),
             'expected' => function (ResponseInterface $response) {
                 return $response->getHeader('Content-MD5');
