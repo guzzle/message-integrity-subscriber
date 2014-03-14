@@ -10,6 +10,7 @@ class PhpHash implements HashInterface
     private $context;
     private $algo;
     private $options;
+    private $hash;
 
     /**
      * @param string $algo Hashing algorithm. One of PHP's hash_algos()
@@ -26,18 +27,26 @@ class PhpHash implements HashInterface
 
     public function update($data)
     {
+        if ($this->hash !== null) {
+            $this->context = $this->hash = null;
+        }
+
         hash_update($this->getContext(), $data);
     }
 
     public function complete()
     {
-        $hash = hash_final($this->getContext(), true);
-
-        if (isset($this->options['base64']) && $this->options['base64']) {
-            $hash = base64_encode($hash);
+        if ($this->hash) {
+            return $this->hash;
         }
 
-        return $hash;
+        $this->hash = hash_final($this->getContext(), true);
+
+        if (isset($this->options['base64']) && $this->options['base64']) {
+            $this->hash = base64_encode($this->hash);
+        }
+
+        return $this->hash;
     }
 
     /**
