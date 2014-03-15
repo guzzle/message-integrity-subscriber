@@ -17,6 +17,20 @@ method for validating a ``Content-MD5`` header.
     $client = new Client();
     $client->getEmitter()->attach($subscriber);
 
+Installing
+----------
+
+This project can be installed using Composer. Add the following to your
+composer.json:
+
+.. code-block:: javascript
+
+    {
+        "require": {
+            "guzzlehttp/message-integrity-subscriber": "0.1.0"
+        }
+    }
+
 Constructor Options
 -------------------
 
