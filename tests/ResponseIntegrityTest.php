@@ -43,7 +43,10 @@ class ResponseIntegrityTest extends \PHPUnit_Framework_TestCase
         $ins = array_map(function ($rec) {
             return get_class($rec[0]);
         }, $request->getEmitter()->listeners('complete'));
-        $this->assertContains('GuzzleHttp\\Subscriber\\MessageIntegrity\\CompleteResponse', $ins);
+        $this->assertContains(
+            'GuzzleHttp\\Subscriber\\MessageIntegrity\\CompleteResponse',
+            $ins
+        );
     }
 
     public function testAddsStreaming()
@@ -55,9 +58,16 @@ class ResponseIntegrityTest extends \PHPUnit_Framework_TestCase
         $client->getEmitter()->attach(new Mock([
             new Response(200, ['Content-MD5' => $md5Test], Stream::factory('foo'))
         ]));
-        $request = $client->createRequest('GET', 'http://httpbin.org', ['stream' => true]);
+        $request = $client->createRequest(
+            'GET',
+            'http://httpbin.org',
+            ['stream' => true]
+        );
         $response = $client->send($request);
-        $this->assertInstanceOf('GuzzleHttp\Subscriber\MessageIntegrity\ReadIntegrityStream', $response->getBody());
+        $this->assertInstanceOf(
+            'GuzzleHttp\Subscriber\MessageIntegrity\ReadIntegrityStream',
+            $response->getBody()
+        );
         $response->getBody()->getContents();
     }
 
