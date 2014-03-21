@@ -60,4 +60,25 @@ class ResponseIntegrityTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('GuzzleHttp\Subscriber\MessageIntegrity\ReadIntegrityStream', $response->getBody());
         $response->getBody()->getContents();
     }
+
+    public function testAddsOnlyOncePerRequest()
+    {
+        $sub = ResponseIntegrity::createForContentMd5();
+        $client = new Client();
+        $client->getEmitter()->attach($sub);
+        $client->getEmitter()->attach(new Mock([
+            new Response(200),
+            new Response(200)
+        ]));
+        $request = $client->createRequest('GET', 'http://httpbin.org');
+        $client->send($request);
+        $client->send($request);
+        $ins = array_filter(
+            $request->getEmitter()->listeners('complete'),
+            function ($rec) {
+                return get_class($rec[0]) === 'GuzzleHttp\\Subscriber\\MessageIntegrity\\CompleteResponse';
+            }
+        );
+        $this->assertCount(1, $ins);
+    }
 }

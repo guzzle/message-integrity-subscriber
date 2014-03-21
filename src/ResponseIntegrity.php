@@ -14,6 +14,7 @@ class ResponseIntegrity implements SubscriberInterface
 {
     private $full;
     private $streaming;
+    private $appliedRequests = [];
 
     /**
      * Creates a new plugin that validates the Content-MD5 of responses
@@ -80,10 +81,21 @@ class ResponseIntegrity implements SubscriberInterface
 
     public function onBefore(BeforeEvent $event)
     {
+        $request = $event->getRequest();
+
+        // So that we do not attach subscribers multiple times, we keep a weak
+        // reference to the request to see if we need to attach the concrete
+        // validation subscribers.
+        $hash = spl_object_hash($request);
+        if (isset($this->appliedRequests[$hash])) {
+            return;
+        }
+
+        $this->appliedRequests[$hash] = true;
         if ($event->getRequest()->getConfig()['stream']) {
-            $event->getRequest()->getEmitter()->attach($this->streaming);
+            $request->getEmitter()->attach($this->streaming);
         } else {
-            $event->getRequest()->getEmitter()->attach($this->full);
+            $request->getEmitter()->attach($this->full);
         }
     }
 }
