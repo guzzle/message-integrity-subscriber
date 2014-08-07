@@ -20,4 +20,9 @@ interface HashInterface
      * @return string
      */
     public function complete();
+
+    /**
+     * Removes all data from the hash, effectively starting a new hash.
+     */
+    public function reset();
 }

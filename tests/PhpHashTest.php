@@ -35,4 +35,13 @@ class PhpHashTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(base64_encode(md5('foobar', true)), $result);
         $this->assertSame($result, $hash->complete());
     }
+
+    public function testCanResetHash()
+    {
+        $hash = new PhpHash('md5');
+        $hash->update('foo');
+        $hash->reset();
+        $hash->update('bar');
+        $this->assertEquals(md5('bar'), bin2hex($hash->complete()));
+    }
 }
