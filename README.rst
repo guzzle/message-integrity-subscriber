@@ -27,7 +27,7 @@ composer.json:
 
     {
         "require": {
-            "guzzlehttp/message-integrity-subscriber": "0.1.0"
+            "guzzlehttp/message-integrity-subscriber": "0.2.*"
         }
     }
 
