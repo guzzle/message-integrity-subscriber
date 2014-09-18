@@ -1,5 +1,4 @@
 <?php
-
 namespace GuzzleHttp\Tests\MessageIntegrity;
 
 use GuzzleHttp\Stream\Stream;
